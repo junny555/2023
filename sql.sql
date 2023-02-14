@@ -186,7 +186,7 @@ CREATE TABLE member(
 		memberGender VARCHAR2(30),
 		memberAddr VARCHAR2(10),
 		memberBirth VARCHAR2(20),
-		delYn CHAR(1) DEFA?깆쑄紐??깆쑄紐?ULT 'N',
+		delYn CHAR(1) DEFAULT 'N',
 		writeday DATE DEFAULT SYSDATE,
 		ip VARCHAR2(30) NULL
 );
@@ -346,11 +346,109 @@ SELECT count(midx) AS cnt FROM member1230 ;
 SELECT sum(midx) AS summidx FROM member1230 ;
 SELECT AVG(midx) AS maxmidx FROM member1230 ;
 --가입된 회원의 총 인원수를 출력하시오
-SELECT COUNT(*) FROM MEMBER1230
+SELECT COUNT(*) FROM MEMBER1230 WHERE DELYN='n'
 --전주에 사는 회원들의  평균나이를 출력하시오
-SELECT AVG(midx) AS avg_age FROM member1230 WHERE memberaddr= '전주';
+SELECT AVG(2023-SUBSTR(memberbirth,1,4)) AS avgage FROM member1230 WHERE memberaddr='전주';
+--SELECT AVG(midx) AS avg_age FROM member1230 WHERE memberaddr= '전주';
 --최근에 등록된 서울에 사는 사람의 이름을 출력하시오
-SELECT
+SELECT MAX(midx) AS maxmidx FROM MEMBER1230 WHERE memberaddr='서울';
 --회원번호 1~7번까지 사람들의 나이의 총합을 구하시오
+SELECT SUM(2023-SUBSTR(memberBirth,1,4)) AS sumage FROM member1230 WHERE midx BETWEEN 1 AND 7;
+
+COMMIT;
+
+--휴대폰 끝자리가 5인사람들의 명단을 지역별 이름 내림차순으로 정렬하시오
+SELECT memberaddr,membername FROM MEMBER1230
+WHERE memberphone LIKE '%5'
+GROUP BY memberaddr,memberName
+ORDER BY  membername DESC;
+
+--사는지역별로 사람들의 인원수 출력
+SELECT  memberaddr,COUNT(midx)FROM MEMBER1230 GROUP BY memberaddr;
 
 
+--insert () 함수 : 검색어의 시작점 위치뽑기
+--사람들의 메일주소의 자리위치를 출력하시오
+SELECT INSTR(memberemail,'@') AS jari FROM member1230;
+
+--회원들의 사용하는 각 메일별로 사람들의 인원수를 출력하시오.
+--select substr(memberemail,instr(memberemail,'@')),count(*)from memeber1230
+--GROUP BY SUBSTR(memberemail,INSTR(memberemail,'@'));
+
+--지역별 성별인원수 출력
+SELECT memberaddr,membergender, COUNT(*) FROM member1230 GROUP BY memberaddr,memberGender ORDER BY memberaddr;
+
+--서브쿼리(쿼리안에 쿼리)
+--회원번호가 회원번호 평큔이하인 사람들의 데이터를 출력하시오
+SELECT * FROM member1230 WHERE midx < (SELECT AVG(midx) FROM MEMBER1230) ;
+--나이가 가장 작은 사람의 전화번호를 출력하시오
+SELECT * FROM MEMBER1230 WHERE (2023 -substr(memberBirth,1,4)=(SELECT MIN(2023-SUBSTR(memberbirth,1,4)) FROM MEMBER1230));
+
+--다중행값을 뽑아내는 서브쿼리
+--회원번호중에 회원번호가 홀수인 사람들의 이름을 서브쿼리로 활용해서 출력하세요
+--mod(컬럼,2)=1; ?깆쑄紐?
+
+--홀수체크
+SELECT membername FroM member1230 WHERE midx IN(SELECT midx FROM member1230 WHERE MOD(midx,2)=1);
+
+--인라인 뷰 서브쿼리 (컬럼
+--회원명단을 출력하고 탈퇴된 회원은 탈퇴라고 출력하세요
+SELECT membername,(SELECT '탈퇴' FROM member1230 b WHERE a.midx=b.midx AND b.delyn='y')FROM MEMBER1230;
+
+--인라인뷰 서브쿼리 (단일테이불이 아닌 제약테이블 사용)
+SELECT * FROM MEMBER1230 a,(SELECT * FROM member1230 WHERE membergender='man')b WHERE a.midx=b.midx
+
+--각 지역별 여성 인원수를 서브쿼리를 활용하여 출력하세요
+--SELECT * FROM memberaddr a, (SELECT * FROM member1230 WHERE membergender='woman')b WHERE member1230;
+SELECT memberGender, COUNT(*)FROM MEMBER1230
+WHERE midx IN(SELECT midx FROM member1230 WHERE memberGender='woman'
+
+
+GROUP BY memberaddr;
+
+
+--정답 select memberaddr,count(*)from member 1230
+--where midx in(select midx from member1230 where membergender='woman')
+--group by memberaddr;
+
+--case when then else end 조건식
+--회원이 성별이 male 이면 남성이라고 출력하고 female 이면 여성출력
+
+SELECT midx,
+CASE memberGender --성별이
+WHEN 'man'THEN '남성'
+WHEN 'woman' THEN '여성'
+else'모름' END AS gender
+FROM member1230;
+
+SELECT midx,
+CASE
+WHEN membergender='man' THEN '남성'
+WHEN membergender='woman' THEN '여성'
+ELSE '모름' END AS gender
+FROM member1230;
+
+
+--decode()조건식
+SELECT midx,DECODE(membergender,'man','남성','woman','여성','모름')AS gender FROM MEMBER1230
+
+--회원탈퇴 되었으면 delyn='y' 탈퇴 출력 n이면 가입이라고 출력하시오 (CASE 문 활용)
+SELECT midx,
+CASE
+WHEN delyn ='y' THEN '탈퇴'
+WHEN delyn ='n' THEN '가입'
+ELSE '모름'END AS delYn
+
+FROM MEMBER1230
+
+--회원번호 짝수인 사람의 ip 를 null처리하기
+UPDATE member1230 SET ip = NULL WHERE MOD(midx,2)=0;
+COMMIT;
+SELECT * FROM member1230;異붿쟻遺덇?異붿쟻媛??
+
+--ip가 널인 사람은 추적불가로 출력하고 아닌 사람은 추적가능이라고 출력하시오
+--null 체크하는 함수 nvl() nvl2()
+SELECT NVL(ip,'추적불가')FROM member1230;
+SELECT NVL2(ip,'추적가능','추적불가')FROM member1230;
+
+SHOW variables LIKE 'datadir%';
