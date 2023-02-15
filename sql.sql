@@ -317,8 +317,7 @@ SELECT * FROM member1230 WHERE membername='김아랑' AND membermail='ttt@naver.
 --회운탈퇴 여부  delyn 를 y 로 변경
 UPDATE member1230 SET delyn='y' WHERE midx =3;
 COMMIT;
-
-SELECT * FROM member1230
+?띾쭏??
 SELECT * FROM member1230 WHERE delyn='N';
 
 
@@ -451,4 +450,134 @@ SELECT * FROM member1230;異붿쟻遺덇?異붿쟻媛??
 SELECT NVL(ip,'추적불가')FROM member1230;
 SELECT NVL2(ip,'추적가능','추적불가')FROM member1230;
 
-SHOW variables LIKE 'datadir%';
+
+--날짜 함수
+--시스템 냘짜 출력
+SELECT SYSDATE FROM dual; --컬럼값을 출력하기 위한 임시테이블
+--시스템 날짜를 문자열로 출력하시오
+--2000-01-01
+
+
+--날짜형을 문자형으로 변환
+SELECT TO_CHAR(SYSDATE,'yyyy-mm--dd') AS 현재날짜 FROM dual;
+
+
+--문자형을 날짜형으로 변환
+SELECT TO_date ('20000101','yyyymmdd') AS 날짜 FROM dual;
+
+--member1230에 writeday 컬럼의 데이터를 문자형으로 2023-01-01 형태대로 출력
+
+SELECT TO_CHAR(writeday,'yyyy--mm--dd') AS ymd FROM member1230;
+
+
+--특정일에 달수를 더할때 add_months()
+--현재 날짜에서 3개월 후의 날짜를 출력하시오
+SELECT ADD_MONTHS(sysdate,3) AS ymd FROM dual;
+
+--특정일의 해당월의 마지막 날짜를 출력 lats_day
+SELECT LAST_DAY(sysdate)FROM dual;
+
+--현재날짜로 부터 6개월후의 마지막 날짜를 출력
+SELECT ADD_MONTHS(SYSDATE,6) AS LAST_DAY FROM dual;
+SELECT ADD_MONTHS(SYSDATE,3) AS
+
+--정답 select last_day(add_months(sysdate,6) from dual;
+
+--요일 next_day ('기준일','찾을요일')
+--다음 일요일의 날짜를 출력하시오
+SELECT sysdate,NEXT_DAY(sysdate,1 )AS 다음일요일날짜 FROM dual;
+
+--trunc 첫날짜를 뽑기
+--현재일로 부터 2개월 후에 첫날짜를 출력하시오
+SELECT TRUNC(ADD_MONTHS(SYSDATE,2),'mm')FROM dual;
+--현재일로부터 올해년도 첫날짜를 출력하시오
+SELECT TRUNC(SYSDATE,'yyyy')FROM dual;
+
+--현재날짜의 3개월 후에 그 달의 세번째 토요일의 날짜를 출력하시오
+
+SELECT NEXT_DAY(ADD_MONTHS(SYSDATE,3),7) FROM dual;
+
+SELECT NEXT_DAY(TRUNC(ADD_MONTHS(SYSDATE,3),'MM')+14,7) FROM dual;
+
+--join문
+
+
+--테이블 생성
+--board1230
+
+CREATE TABLE board1230 (
+bidx NUMBER not NULL PRIMARY key,
+subject VARCHAR2(50) NOT null,
+CONTENTS VARCHAR2(1000) null,
+writer VARCHAR2(20) null,
+delyn CHAR(1) DEFAULT 'n',
+writeday DATE DEFAULT sysdate,
+
+ip VARCHAR2(30)null,
+midx NUMBER NOT NULL ,
+CONSTRAINTS midx_fk FOREIGN KEY(midx) REFERENCES member1230(midx)
+);
+
+
+SELECT * FROM board1230;
+
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(1,'첫번째 글입니다','첫번째 내용','김민수','111.222.333.444',1);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(2,'두번째 글입니다','두번째 내용','행인','222.222.333.444',2);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(3,'세번째 글입니다','세번째 내용','아이언맨','222.222.333.555',1);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(4,'네번째 글입니다','네번째 내용','토르',null,3);
+
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(5,'다섯번째 글입니다','다섯번째 내용','스파이더맨',null,4);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(6,'여섯번째 글입니다','여섯번째 내용','슈퍼맨',null,3);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(7,'일곱번째 글입니다','일곱번째 내용','원더우먼',null,5);
+
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(8,'여뎗번째 글입니다','여덟번째 내용','베트맨',null,6);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(9,'아홉번째 글입니다','아홉번째 내용','이순신',null,1);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(10,'열번째 글입니다','열번째 내용','김순자',null,9);
+
+COMMIT;
+?ㅼ꽢踰덉㎏ ?댁슜
+--inner join (공통된 컬럼으로 묶어서 하나의 테이블로 만드는 작업)
+--형식 (테이블 A inner join 테이블 B on a.pk컬럼 = b(컬럼)
+--3번째 글 을 쓴 사람의 나이 알려주셈
+SELECT * FROM member1230 A
+INNER JOIN board1230 b ON a.midx = b.midx;
+WHERE b.bidx=3;
+
+SELECT SYSDATE-SUBSTR(A.memberbirth,1,4) AS age FROM MEMBER1230
+JOIN board1230 B ON A.midx
+WHERE b.midx =3;
+
+
+SELECT * FROM member1230 A ,board1230 B WHERE a.midx=b.midx;
+
+
+SELECT * FROM board1230;
+
+
+--홍길순인 사람이 쓴 글의 갯수 출력
+SELECT * FROM MEMBER1230 a INNER JOIN
+
+board1230 b ON a.midx=b.midx WHERE a.membername ='홍길순';
+
+--지역별 게시물 쓴 사람 인원수 출력
+--distinct 중복제거
+SELECT a.memberaddr,COUNT(*)FROM  MEMBER1230 a INNER JOIN board1230 b ON a.midx=b.midx GROUP
+BY a.memberaddr;
+
+SELECT DISTINCT b.midx FROM board1230 b;
+
+--게시글 내용중 다섯이라는 글자가 포함된 글의 쓴 사람의 아이디를 출력
+SELECT *
+FROM BOARD1230
+WHERE CONTENTS LIKE '%다섯%';
+--정답 select a.memberid from member1230
+--a inner join board1230 b on a.midx =b.midx
+--where b.contents like '%다섯%';
+
+--회원번호 1,8번에 해당하는 사람이 쓴 게시글의 ip를 추출하고 없으면 ip없음으로 출력
+--SELECT a.midx,NVL(b.ip,'ip없음')FROM MEMBER1230 a INNER JOIN board1230 b ON a.midx=b.midx WHERE a.midx IN (1,8);
+
+
+--게시글 쓴 사람의 닉네임이 3글자 이상인 사람의 성별 출력
+SELECT DECODE(a.membergender,'man','남','woman','여')AS gender FROM MEMBER1230 a INNER JOIN board1230 b ON a.midx=b.midx
+WHERE LENGTH(b.writer)>=3;
