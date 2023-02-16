@@ -241,6 +241,7 @@ INSERT INTO member1230 VALUES(9,'test9','9999','성윤마','g@a.a','man','인천
 INSERT INTO member1230 VALUES(10,'test10','1010','성윤히','h@a.a','man','경기','20080101',default,SYSDATE,'127.0.0.10');
 COMMIT;
 
+
 /*
 	데이터 탐색하기
 	SELECT * FROM 테이블이름;
@@ -581,3 +582,107 @@ WHERE CONTENTS LIKE '%다섯%';
 --게시글 쓴 사람의 닉네임이 3글자 이상인 사람의 성별 출력
 SELECT DECODE(a.membergender,'man','남','woman','여')AS gender FROM MEMBER1230 a INNER JOIN board1230 b ON a.midx=b.midx
 WHERE LENGTH(b.writer)>=3;
+
+
+
+
+--crud 작업?
+
+--left outer join
+--왼쪽에 있는 모든 것과 오른쪽에 있는 공통된 데이터
+--형식 select * from table a left outer join 테이블 b on a 공통 컬럼 = b.공통컬럼
+--각 지역별로 글쓴 사람의 인원수 출력
+SELECT a.memberaddr, COUNT(DISTINCT b.midx) FROM member1230 a LEFT OUTER JOIN
+board1230 b ON a.midx=b.midx GROUP BY a.memberaddr;
+
+
+
+SELECT * FROM member1230 a LEFT OUTER JOIN board1230 b ON a.midx=b.midx --표준쿼리
+
+SELECT * FROM member1230 a, board1230 b WHERE a.midx =b.midx(+)AND 조건식;
+
+--성별로 글쓴 사람의 인원수 출력(남성몇명,여성몇명)
+SELECT a.memberGender,COUNT(DISTINCT b.midx) FROM MEMBER1230 a LEFT OUTER  JOIN
+board1230 b ON a.midx=b.midx GROUP BY a.membergender;
+
+--게시글을 쓴 사람들 중에 최고 나이많은 사람의 나이와 가장 어린 사람의 나이를 출력하시오
+
+SELECT
+    MAX(memberBirth) AS max,
+    MIN(memberBirth) AS MIN
+FROM
+    MEMBER1230 b;
+
+--선생님 풀이 select max(2023-substr(memberbirth,1,4)),min(2023-substr(memberbirth,1,4))from member1230 a join board1230 b on a.midx=b.midx
+
+--3번 5번인 사람이 쓴 글의 내용중에 안녕이라는 글자가 포함된 글을 번호로 출력하시오
+SELECT board1230
+FROM CONTENTS JOIN board1230 ON CONTENTS,ip =CONTENTS,ip
+WHERE CONTENTS,ip IN(3,5) AND
+CONTENTS LIKE '%안녕 %';
+
+--선생님풀이 select bidx from bodrd1230 where midx in(3,5) and contents like '%안녕%';
+
+--시퀀스(sequence)- 순서를 갖춘 장면 (자동번호표)
+--자동번호를 표를 만들어내는 객체
+--형식 create sequence 시퀀스이름
+-- increment by 1(증가)
+--start with 1;
+CREATE SEQUENCE midx_seq
+INCREMENT BY 1
+START WITH 1;
+
+
+SELECT MIDX_SEQ.NEXTVAL FROM dual; --번호표
+
+SELECT MIDX_SEQ.CURRVAL FROM dual;--현재값출력 올라가지않음
+
+DELETE FROM member1230; --오류 나중삭제
+
+DELETE
+ FROM BOARD1230; --이것먼저 삭제
+ COMMIT;
+ SELECT * FROM member1230;
+ SELECT * FROM BOARD1230 ;
+
+ INSERT INTO member1230(midx,memberId,memberPw,memberName,memberEmail,memberGender,memberAddr,memberBirth,ip)
+	VALUES(midx_seq.NEXTVAL,'test1','1111','홍길동ㅁ','test1@a.a','man','전주','19000101','127.0.0.1');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test2','2222','홍길서ㅁ','s@a.a','man','서울','20000101','Y',SYSDATE,'127.0.0.2');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test3','3333','홍미영ㅁ','a@a.a','man','대전','20010101','Y',SYSDATE,'127.0.0.3');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test4','4444','홍마영ㅁ','b@a.a','woman','대구','20020101','N',SYSDATE,'127.0.0.4');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test5','5555','홍무영ㅁ','c@a.a','woman','부산','20030101','Y',SYSDATE,'127.0.0.5');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test6','6666','황모영ㅁ','d@a.a','man','순천','20041001','N',SYSDATE,'127.0.0.6');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test7','7777','성윤모ㅁ','e@a.a','woman','여수','20050101','Y',SYSDATE,'127.0.0.7');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test8','8888','성윤무ㅁ','f@a.a','man','강릉','20060101','N',SYSDATE,'127.0.0.8');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test9','9999','성윤마ㅁ','g@a.a','man','인천','20070101','N',SYSDATE,'127.0.0.9');
+INSERT INTO member1230 VALUES(midx_seq.NEXTVAL,'test10','1010','성윤히ㅁ','h@a.a','man','경기','20080101',default,SYSDATE,'127.0.0.10');
+COMMIT;
+
+DROP SEQUENCE midx_seq;
+
+SELECT * FROM MEMBER1230 ;
+COMMIT;
+
+
+
+--게시글 모두를 지우고 스퀀스 bidx_seq 를 생성해서 게시글 샘플데이터 적용
+SELECT * FROM BOARD1230  ;
+CREATE SEQUENCE bidx_seq
+
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'첫번째 글입니다','첫번째 내용','김민수','111.222.333.444',1);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'두번째 글입니다','두번째 내용','행인','222.222.333.444',2);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'세번째 글입니다','세번째 내용','아이언맨','222.222.333.555',1);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'네번째 글입니다','네번째 내용','토르',null,3);
+
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'다섯번째 글입니다','다섯번째 내용','스파이더맨',null,4);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'여섯번째 글입니다','여섯번째 내용','슈퍼맨',null,3);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'일곱번째 글입니다','일곱번째 내용','원더우먼',null,5);
+
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'여뎗번째 글입니다','여덟번째 내용','베트맨',null,6);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAL,'아홉번째 글입니다','아홉번째 내용','이순신',null,1);
+INSERT INTO board1230(bidx,subject,contents,writer,ip,midx)VALUES(bidx_seq.NEXTVAl,'열번째 글입니다','열번째 내용','김순자',null,9);
+ COMMIT;
+
+SELECT * FROM BOARD1230 ;
+
+
